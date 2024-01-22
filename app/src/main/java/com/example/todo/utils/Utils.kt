@@ -32,13 +32,6 @@ class Utils {
       return LocalTime.now()
     }
 
-    fun capitalizeFirstLetter(input: String?): String {
-      if (input.isNullOrBlank()) {
-        return ""
-      }
-      return input.substring(0, 1).uppercase() + input.substring(1).lowercase()
-    }
-
     fun getDaysInMonth(): Int {
       val year = getCurrentDate().year
       val month = getCurrentDate().monthValue
@@ -56,15 +49,11 @@ class Utils {
       return instant.atZone(ZoneId.systemDefault()).toLocalDate()
     }
 
-
-    fun getLocalDateTime(date: LocalDate, time: LocalTime): LocalDateTime {
-      return LocalDateTime.of(date, time)
+    fun convertTimestampToDateTime(timestamp: String): LocalDateTime {
+      val epochMillis = timestamp.toLongOrNull() ?: 0L
+      return Instant.ofEpochMilli(epochMillis).atZone(ZoneOffset.UTC).toLocalDateTime()
     }
 
-    // Добавляем еще одну перегрузку, которая принимает timestamp в миллисекундах
-    fun getLocalDateTime(timestamp: Long): LocalDateTime {
-      return LocalDateTime.ofEpochSecond(timestamp, 0, ZoneOffset.UTC)
-    }
   }
 }
 

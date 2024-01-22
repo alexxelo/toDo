@@ -62,8 +62,6 @@ fun AppNavGraph(
     ) { backStackEntry ->
       val date = backStackEntry.arguments?.getLong("date") ?: 0L
       val localDateTime = Instant.ofEpochMilli(date).atZone(ZoneId.systemDefault()).toLocalDateTime()
-      Log.d("Debug", "Selected date nav host: ${localDateTime.toLocalDate()}")
-
       ItemEntryScreen(
         date = localDateTime,
         navigateBack = { navController.popBackStack() },
