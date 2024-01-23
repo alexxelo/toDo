@@ -33,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -57,7 +58,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.todo.AppViewModelProvider
-import com.example.todo.data.ToDoItem
 import com.example.todo.utils.Utils
 import com.example.todo.utils.displayText
 import com.example.todo.utils.rememberFirstCompletelyVisibleMonth
@@ -76,14 +76,11 @@ import java.time.YearMonth
 @Composable
 fun HomeScreen(
   modifier: Modifier = Modifier,
-  // int for item id
   navigateToItemDetails: (Int) -> Unit,
-  navigateBack: () -> Unit,
   navigateToEntry: (date: LocalDate) -> Unit,
   viewModel: HomeViewModel = viewModel(factory = AppViewModelProvider.Factory),
 
   ) {
-  // :State<HomeUiState>
   // дела которые добавлены в базу
   val homeUi = viewModel.homeUiState.collectAsState()
 //
@@ -113,22 +110,14 @@ fun HomeScreen(
         outerSelection = clickedDay
       }
       Spacer(modifier = Modifier.height(20.dp))
+      if (outerSelection != null) {
+        TodoTable(day = outerSelection!!.date.dayOfMonth.toString(),
+          dayOfWeek = outerSelection!!.date.dayOfWeek.name,
+          homeUiState = homeUi.value,
+          onItemClick = {
 
-//      Column(
-//        modifier = Modifier
-//          .fillMaWidth()
-//      ) {
-//        clickedCalendarElem?.let { toDoItem ->
-//
-//          val findDayOfWeek = clickedCalendarElem?.day?.let { Utils.getCurrentDate().withDayOfMonth(it).dayOfWeek.name }
-//          val findDayOfWeekCount = clickedCalendarElem?.day?.let { Utils.getCurrentDate().withDayOfMonth(it).dayOfMonth }
-//
-//          dayOfWeek = Utils.capitalizeFirstLetter(findDayOfWeek)
-//          dayOfWeekCount = findDayOfWeekCount.toString()
-//
-//          //TodoTable(dayOfWeekCount, dayOfWeek,)
-//        }
-//      }
+          })
+      }
     }
   }
 }
@@ -136,14 +125,13 @@ fun HomeScreen(
 
 @Composable
 fun Calendar(
-
   onClick: (CalendarDay) -> Unit
 ) {
 
   val currentMonth = remember { YearMonth.now() }
   val startMonth = remember { currentMonth.minusMonths(100) }
   val endMonth = remember { currentMonth.plusMonths(100) }
-  val daysOfWeek = remember { daysOfWeek() }
+  val dayOfWeek = remember { daysOfWeek() }
 
   var selection: CalendarDay? by remember { mutableStateOf<CalendarDay?>(null) }
 
@@ -151,7 +139,7 @@ fun Calendar(
     startMonth = startMonth,
     endMonth = endMonth,
     firstVisibleMonth = currentMonth,
-    firstDayOfWeek = daysOfWeek.first(),
+    firstDayOfWeek = dayOfWeek.first(),
   )
 
   val visibleMonth = rememberFirstCompletelyVisibleMonth(state)
@@ -185,24 +173,21 @@ fun Calendar(
       ) {
         onClick(it)
         selection = it
+
       }
     },
     monthHeader = {
       MonthHeader(
         modifier = Modifier.padding(vertical = 8.dp),
-        daysOfWeek = daysOfWeek
+        daysOfWeek = dayOfWeek
       )
     },
   )
-  LazyColumn(modifier = Modifier.fillMaxWidth()) {
-
-  }
 }
 
 @Composable
 private fun MonthHeader(
-  modifier: Modifier = Modifier,
-  daysOfWeek: List<DayOfWeek> = emptyList(),
+  modifier: Modifier = Modifier, daysOfWeek: List<DayOfWeek> = emptyList(),
 ) {
   Row(modifier.fillMaxWidth()) {
     for (dayOfWeek in daysOfWeek) {
@@ -219,7 +204,9 @@ private fun MonthHeader(
 }
 
 @Composable
-fun Day(day: CalendarDay, isSelected: Boolean = false, onClick: (CalendarDay) -> Unit) {
+fun Day(
+  day: CalendarDay, isSelected: Boolean = false, onClick: (CalendarDay) -> Unit
+) {
   Box(
     modifier = Modifier
       .aspectRatio(1f)
@@ -304,7 +291,7 @@ private fun CalendarNavigationIcon(
 
 @Composable
 fun TodoTable(
-  day: String, dayOfWeek: String, hoursInDay: Int = 24, onItemClick: (ToDoItem) -> Unit
+  day: String, dayOfWeek: String, hoursInDay: Int = 24, homeUiState: HomeUiState, onItemClick: (Int) -> Unit
 ) {
   //add day of week
   val listState = rememberLazyListState()
@@ -324,7 +311,7 @@ fun TodoTable(
     contentPadding = PaddingValues(horizontal = 8.dp, vertical = 16.dp)
   ) {
     items(hoursInDay) { hour ->
-      TimeLine(hour, onItemClick)
+      TimeLine(hour, homeUiState, onItemClick)
     }
 
   }
@@ -345,7 +332,6 @@ fun TimelineNode(
     modifier = Modifier
       .wrapContentSize()
       .drawBehind {
-        // 2. draw a circle here ->
         val circleRadiusInPx = 8.sp
         drawCircle(
           color = Color.Magenta,
@@ -357,7 +343,6 @@ fun TimelineNode(
     content(
       Modifier
         .padding(
-          // 2. we apply our paddings
           start = contentStartOffset,
           bottom = spacerBetweenNodes
         )
@@ -379,14 +364,14 @@ private fun MessageBubble(modifier: Modifier, containerColor: Color) {
 fun ToDoHourItem(
   hour: Int,
   homeUiState: HomeUiState,
-  onItemClick: (ToDoItem) -> Unit
+  onItemClick: (Int) -> Unit
 ) {
   val matchingData = homeUiState.toDoList.find { Utils.timestampToZonedDateTime(it.dateStart).hour == hour }
 
   if (matchingData != null) {
-    Box(modifier = Modifier.clickable { onItemClick(matchingData) }) {
+    Box(modifier = Modifier.clickable { onItemClick(matchingData.id) }) {
       Text(
-        text = " A name \n dateStart - dateEnd", //"${matchingData.name}\n\n${matchingData.dateStart} - ${matchingData.dateFinish}",
+        text = "${matchingData.name}\n\n${matchingData.dateStart} - ${matchingData.dateFinish}",
         modifier = Modifier
           .drawBehind {
             drawRoundRect(
@@ -398,31 +383,13 @@ fun ToDoHourItem(
       )
     }
   }
-
-//  if (matchingData != null) {
-//    Box(
-//      modifier = Modifier
-//        .fillMaxWidth()
-//        .padding(start = 52.dp)
-//        .height(50.dp)
-//        .background(Color.Red, shape = RectangleShape)
-//        .border(border = BorderStroke(2.dp, Color.Blue))
-//    ) {
-//      Text(
-//        text = homeUiState.toDoList[matchingData.id].name,
-//        modifier = Modifier
-//          .align(Alignment.Center)
-//          .padding(16.dp),
-//        color = Color.Black,
-//        fontWeight = FontWeight.Bold,
-//        fontSize = 20.sp,
-//      )
-//    }
-//  }
 }
 
 @Composable
-fun TimeLine(hour: Int, onItemClick: (ToDoItem) -> Unit) {
+fun TimeLine(
+  hour: Int, homeUiState: HomeUiState,
+  onItemClick: (Int) -> Unit
+) {
   Row(
     modifier = Modifier
       .fillMaxWidth()
@@ -442,7 +409,7 @@ fun TimeLine(hour: Int, onItemClick: (ToDoItem) -> Unit) {
         .background(Color.Gray)
         .width(1.dp)
     )
-    //ToDoHourItem("123", onItemClick)
+    ToDoHourItem(hour, homeUiState, onItemClick)
   }
 }
 
@@ -450,8 +417,7 @@ fun TimeLine(hour: Int, onItemClick: (ToDoItem) -> Unit) {
 @Preview(showSystemUi = true, showBackground = true, device = Devices.NEXUS_5)
 @Composable
 fun HomeScreenPreview(modifier: Modifier = Modifier) {
-  //ToDoHourItem(2,)
-  //Calendar()
+
 }
 
 @Preview(showBackground = true)

@@ -30,7 +30,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun ItemDetailsScreen(
   modifier: Modifier = Modifier,
-  itemId: Int,
   navigateBack: () -> Unit,
   viewModel: ItemDetailsViewModel = viewModel(factory = AppViewModelProvider.Factory),
 
@@ -88,7 +87,7 @@ fun ItemDetails(
       .fillMaxSize(), verticalArrangement = Arrangement.spacedBy(16.dp)
   ) {
     Text(
-      text = itemDetailsUiState.itemDetails.toToDoItem().name,
+      text = itemDetailsUiState.itemDetails.name,
       fontSize = 26.sp,
       fontWeight = FontWeight.Bold,
       textAlign = TextAlign.Start

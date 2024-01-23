@@ -40,7 +40,6 @@ fun AppNavGraph(
       val itemId = backStackEntry.arguments?.getInt("itemId") ?: 0
       HomeScreen(
         navigateToItemDetails = { navController.navigate("${Destinations.DETAIL}/$itemId") },
-        navigateBack = { navController.popBackStack() },
         navigateToEntry = { day ->
           navController.navigate("${Destinations.ENTRY}/${day.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()}")
         }
@@ -51,9 +50,8 @@ fun AppNavGraph(
       arguments = listOf(navArgument("itemId") { type = NavType.IntType })
     ) { backStackEntry ->
       val itemId = backStackEntry.arguments?.getInt("itemId") ?: 0
-
       ItemDetailsScreen(
-        itemId = itemId,
+        //itemId = itemId,
         navigateBack = { navController.popBackStack() })
     }
     composable(
