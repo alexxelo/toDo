@@ -1,5 +1,6 @@
 package com.example.todo.ui.item
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -59,42 +60,27 @@ fun ItemEntryScreen(
 ) {
   val scope = rememberCoroutineScope()
 
-  var choseTime = remember {
-    mutableStateOf(date.toLocalTime())
-  }
-  var choseDate = remember {
-    mutableStateOf(date.toLocalDate())
-  }
-  Scaffold(
-    topBar = {
-      CenterAlignedTopAppBar(
-        title = {
-          Text(text = stringResource(R.string.new_event))
-        },
-        navigationIcon = {
-          TextButton(onClick = {
-            navigateBack()
-          }) {
-            Text(text = stringResource(R.string.cancel), fontSize = 20.sp)
-          }
-        },
-      )
-    }
-  )
-  { innerPadding ->
-    ToDoEntryBody(
-      itemUiState = viewModel.itemUiState,
-      date = date,
-      onSaveClick = {
-        scope.launch {
-          viewModel.saveToDoItem(time = choseTime.value,)
+  Scaffold(topBar = {
+    CenterAlignedTopAppBar(
+      title = {
+        Text(text = stringResource(R.string.new_event))
+      },
+      navigationIcon = {
+        TextButton(onClick = {
           navigateBack()
+        }) {
+          Text(text = stringResource(R.string.cancel), fontSize = 20.sp)
         }
       },
-      onTimeChange = {  choseTime.value = it},
-      onDateChange = {  choseDate.value = it},
-      onValueChange = viewModel::updateUiState,
-      modifier = Modifier
+    )
+  }) { innerPadding ->
+    ToDoEntryBody(
+      itemUiState = viewModel.itemUiState, date = date.toLocalDate(), onSaveClick = {
+        scope.launch {
+          viewModel.saveToDoItem()
+          navigateBack()
+        }
+      }, onValueChange = viewModel::updateUiState, modifier = Modifier
         .padding(innerPadding)
         .verticalScroll(rememberScrollState())
         .fillMaxWidth()
@@ -105,30 +91,17 @@ fun ItemEntryScreen(
 
 @Composable
 fun ToDoEntryBody(
-  itemUiState: ItemUiState,
-  date: LocalDateTime,
-  onSaveClick: () -> Unit,
-  onValueChange: (ToDoItemDetails) -> Unit = {},
-  onTimeChange: (LocalTime) -> Unit = {},
-  onDateChange: (LocalDate) -> Unit = {},
-  modifier: Modifier = Modifier
+  itemUiState: ItemUiState, date: LocalDate, onSaveClick: () -> Unit, onValueChange: (ToDoItemDetails) -> Unit = {}, modifier: Modifier = Modifier
 ) {
   Column(
     verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large)),
     modifier = modifier.padding(dimensionResource(id = R.dimen.padding_medium))
   ) {
     ToDoItemEntryForm(
-      itemDetails = itemUiState.itemDetails,
-      date = date,
-      onValueChange = onValueChange,
-      onTimeChange = onTimeChange,
-      onDateChange = onDateChange,
-      modifier = Modifier.fillMaxWidth()
+      itemDetails = itemUiState.itemDetails, date = date, onValueChange = onValueChange, modifier = Modifier.fillMaxWidth()
     )
     Button(
-      onClick = { onSaveClick() },
-      enabled = itemUiState.isEntryValid,
-      modifier = Modifier.fillMaxWidth()
+      onClick = { onSaveClick() }, enabled = itemUiState.isEntryValid, modifier = Modifier.fillMaxWidth()
     ) {
       Text(text = stringResource(R.string.save))
     }
@@ -138,58 +111,38 @@ fun ToDoEntryBody(
 
 @Composable
 fun ToDoItemEntryForm(
-  itemDetails: ToDoItemDetails,
-  date: LocalDateTime,
-  modifier: Modifier = Modifier,
-  onValueChange: (ToDoItemDetails) -> Unit = {},
-  onTimeChange: (LocalTime) -> Unit = {},
-  onDateChange: (LocalDate) -> Unit = {},
-  enabled: Boolean = true
+  itemDetails: ToDoItemDetails, date: LocalDate, modifier: Modifier = Modifier, onValueChange: (ToDoItemDetails) -> Unit = {}, enabled: Boolean = true
 ) {
   Column(modifier = modifier) {
     OutlinedTextField(
-      value = itemDetails.name,
-      onValueChange = {
+      value = itemDetails.name, onValueChange = {
         onValueChange(itemDetails.copy(name = it))
-      },
-      colors = OutlinedTextFieldDefaults.colors(
+      }, colors = OutlinedTextFieldDefaults.colors(
         focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
         unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
         disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-      ),
-      label = {
+      ), label = {
         Text(text = stringResource(R.string.title))
-      },
-      enabled = enabled,
-      modifier = Modifier
+      }, enabled = enabled, modifier = Modifier
         .padding(horizontal = 16.dp)
         .fillMaxWidth()
     )
 
-    TimePicker(text = stringResource(R.string.starts), date, onTimeChange, onDateChange)
+    TimePicker(text = stringResource(R.string.starts), date, itemDetails)
     TimePicker(
-      text = stringResource(R.string.ends),
-      date = date,
-      onTimeChange = onTimeChange,
-      onDateChange= onDateChange,
-      initialTime = Utils.getCurrentTime().plusHours(1)
+      text = stringResource(R.string.ends), date = date, itemDetails, isStartTime = false, initialTime = Utils.getCurrentTime().plusHours(1)
     )
 
     OutlinedTextField(
-      value = itemDetails.description,
-      onValueChange = {
+      value = itemDetails.description, onValueChange = {
         onValueChange(itemDetails.copy(description = it))
-      },
-      colors = OutlinedTextFieldDefaults.colors(
+      }, colors = OutlinedTextFieldDefaults.colors(
         focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
         unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
         disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-      ),
-      label = {
+      ), label = {
         Text(text = stringResource(R.string.description))
-      },
-      enabled = enabled,
-      modifier = Modifier
+      }, enabled = enabled, modifier = Modifier
         .padding(horizontal = 16.dp)
         .fillMaxWidth()
         .height(150.dp)
@@ -201,50 +154,63 @@ fun ToDoItemEntryForm(
 @Composable
 fun TimePicker(
   text: String,
-  date: LocalDateTime,
-  onTimeChange: (LocalTime) -> Unit = {},
-  onDateChange: (LocalDate) -> Unit = {},
+  date: LocalDate,
+  itemDetails: ToDoItemDetails,
+  onValueChange: (ToDoItemDetails) -> Unit = {},
+  isStartTime: Boolean = true,
   initialTime: LocalTime = Utils.getCurrentTime()
 ) {
   // передать дату клика
   var pickedDate by remember {
-    mutableStateOf(date.toLocalDate())
+    mutableStateOf(date)
   }
   var pickedTime by remember {
     mutableStateOf(initialTime)
   }
+  var dateTime by remember {
+    mutableStateOf(LocalDateTime.of(pickedDate, pickedTime))
+  }
 
   val formattedDate by remember {
     derivedStateOf {
-      DateTimeFormatter
-        .ofPattern("DD MMM y")
-        .format(pickedDate)
+      DateTimeFormatter.ofPattern("DD MMM y").format(pickedDate)
     }
   }
   val formattedTime by remember {
     derivedStateOf {
-      DateTimeFormatter
-        .ofPattern("hh:mm")
-        .format(pickedTime)
+      DateTimeFormatter.ofPattern("hh:mm").format(pickedTime)
     }
   }
   val dateState = rememberUseCaseState()
   val clockState = rememberUseCaseState()
+  val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+
+  fun updateTime() {
+    dateTime = LocalDateTime.of(pickedDate, pickedTime)
+    val updatedItemDetails = if (isStartTime) {
+      itemDetails.copy(dateStart = dateTime.format(formatter))
+    } else {
+      itemDetails.copy(dateFinish = dateTime.format(formatter))
+    }
+    onValueChange(updatedItemDetails)
+  }
 
   CalendarDialog(
     state = dateState,
     config = CalendarConfig(monthSelection = true, yearSelection = true),
     selection = CalendarSelection.Date { day ->
       pickedDate = day
-      onDateChange(pickedDate)
+      updateTime()
+    },
+  )
 
-    })
+
   ClockDialog(
     state = clockState,
     config = ClockConfig(),
     selection = ClockSelection.HoursMinutes { hours, minutes ->
       pickedTime = LocalTime.of(hours, minutes)
-      onTimeChange(pickedTime)
+      updateTime()
     })
 
   Row(
@@ -255,15 +221,10 @@ fun TimePicker(
 
     ) {
     Text(
-      text = text,
-      fontSize = 22.sp,
-      textAlign = TextAlign.Left,
-      modifier = Modifier
+      text = text, fontSize = 22.sp, textAlign = TextAlign.Left, modifier = Modifier
     )
     Row(
-      horizontalArrangement = Arrangement.End,
-      modifier = Modifier
-        .fillMaxWidth()
+      horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()
     ) {
       Button(onClick = {
         dateState.show()

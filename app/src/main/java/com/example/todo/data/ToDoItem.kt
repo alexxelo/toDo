@@ -13,11 +13,4 @@ data class ToDoItem(
   val description: String,
   val dateStart: Long,
   val dateFinish: Long
-
-) {
-  val day: Int
-    get() {
-      val localDate = Instant.ofEpochMilli(dateStart).atZone(ZoneId.systemDefault()).toLocalDate()
-      return localDate.dayOfMonth
-    }
-}
+)

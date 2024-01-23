@@ -38,6 +38,5 @@ class ItemDetailsViewModel(
 
 }
 data class ToDoItemDetailsUiState(
-  //val outOfStock: Boolean = true,
   val itemDetails: ToDoItemDetails = ToDoItemDetails()
 )
