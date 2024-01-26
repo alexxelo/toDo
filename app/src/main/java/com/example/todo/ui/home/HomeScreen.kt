@@ -313,7 +313,6 @@ fun TodoTable(
     items(hoursInDay) { hour ->
       TimeLine(hour, homeUiState, onItemClick)
     }
-
   }
 
   LaunchedEffect(true) {
@@ -351,16 +350,6 @@ fun TimelineNode(
 }
 
 @Composable
-private fun MessageBubble(modifier: Modifier, containerColor: Color) {
-  Card(
-    modifier = modifier
-      .width(200.dp)
-      .height(100.dp),
-    colors = CardDefaults.cardColors(containerColor = containerColor)
-  ) {}
-}
-
-@Composable
 fun ToDoHourItem(
   hour: Int,
   homeUiState: HomeUiState,
@@ -376,7 +365,7 @@ fun ToDoHourItem(
           .drawBehind {
             drawRoundRect(
               Color(0xFFBBAAEE),
-              cornerRadius = CornerRadius(10.dp.toPx())
+              cornerRadius = CornerRadius(20.dp.toPx())
             )
           }
           .padding(4.dp)
@@ -428,9 +417,7 @@ private fun TimelinePreview() {
       .fillMaxWidth()
       .padding(16.dp)
   ) {
-    TimelineNode() { modifier -> MessageBubble(modifier, containerColor = Color.Blue) }
-    TimelineNode() { modifier -> MessageBubble(modifier, containerColor = Color.Red) }
-    TimelineNode() { modifier -> MessageBubble(modifier, containerColor = Color.Green) }
+
   }
 
 }
