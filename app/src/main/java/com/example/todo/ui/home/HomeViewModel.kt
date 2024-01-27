@@ -13,6 +13,12 @@ import kotlinx.coroutines.flow.stateIn
 import java.time.LocalDate
 
 class HomeViewModel(toDoListRepository: ToDoListRepository) : ViewModel() {
+  fun getToDoItemForDay(date: LocalDate, toDoList: List<ToDoItem>, hour: Int): ToDoItem? {
+    return toDoList.find {
+      Utils.timestampToLocalDate(it.dateStart) == date &&
+      Utils.timestampToZonedDateTime(it.dateStart).hour == hour
+    }
+  }
 
   private val getToDoListUseCase = GetToDoListUseCase(toDoListRepository)
 
@@ -25,10 +31,7 @@ class HomeViewModel(toDoListRepository: ToDoListRepository) : ViewModel() {
 
   companion object {
     private const val TIMEOUT_MILLIS = 5_000L
-    fun getToDoItemForDay(date: LocalDate, toDoList: List<ToDoItem>): ToDoItem? {
-      // Фильтруем список, чтобы найти ToDoItem для указанной даты
-      return toDoList.find { Utils.timestampToLocalDate(it.dateStart) == date }
-    }
+
   }
 }
 

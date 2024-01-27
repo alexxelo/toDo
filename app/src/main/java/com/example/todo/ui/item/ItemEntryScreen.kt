@@ -80,7 +80,8 @@ fun ItemEntryScreen(
           viewModel.saveToDoItem()
           navigateBack()
         }
-      }, onValueChange = viewModel::updateUiState, modifier = Modifier
+      }, onValueChange = viewModel::updateUiState,
+      modifier = Modifier
         .padding(innerPadding)
         .verticalScroll(rememberScrollState())
         .fillMaxWidth()
@@ -115,7 +116,8 @@ fun ToDoItemEntryForm(
 ) {
   Column(modifier = modifier) {
     OutlinedTextField(
-      value = itemDetails.name, onValueChange = {
+      value = itemDetails.name,
+      onValueChange = {
         onValueChange(itemDetails.copy(name = it))
       }, colors = OutlinedTextFieldDefaults.colors(
         focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
@@ -128,13 +130,21 @@ fun ToDoItemEntryForm(
         .fillMaxWidth()
     )
 
-    TimePicker(text = stringResource(R.string.starts), date, itemDetails)
+    TimePicker(text = stringResource(R.string.starts), date,
+      itemDetails = itemDetails.copy(dateStart = itemDetails.dateStart, dateFinish = itemDetails.dateFinish),
+      onValueChange = {updatedItemDetails ->
+        onValueChange(updatedItemDetails)})
     TimePicker(
-      text = stringResource(R.string.ends), date = date, itemDetails, isStartTime = false, initialTime = Utils.getCurrentTime().plusHours(1)
+      text = stringResource(R.string.ends), date = date, itemDetails, isStartTime = false,
+      initialTime = Utils.getCurrentTime().plusHours(1),
+      onValueChange = { updatedItemDetails ->
+        onValueChange(updatedItemDetails)
+      },
     )
 
     OutlinedTextField(
-      value = itemDetails.description, onValueChange = {
+      value = itemDetails.description,
+      onValueChange = {
         onValueChange(itemDetails.copy(description = it))
       }, colors = OutlinedTextFieldDefaults.colors(
         focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
@@ -160,7 +170,6 @@ fun TimePicker(
   isStartTime: Boolean = true,
   initialTime: LocalTime = Utils.getCurrentTime()
 ) {
-  // передать дату клика
   var pickedDate by remember {
     mutableStateOf(date)
   }
@@ -173,12 +182,12 @@ fun TimePicker(
 
   val formattedDate by remember {
     derivedStateOf {
-      DateTimeFormatter.ofPattern("DD MMM y").format(pickedDate)
+      DateTimeFormatter.ofPattern("dd MMM y").format(pickedDate)
     }
   }
   val formattedTime by remember {
     derivedStateOf {
-      DateTimeFormatter.ofPattern("hh:mm").format(pickedTime)
+      DateTimeFormatter.ofPattern("HH:mm").format(pickedTime)
     }
   }
   val dateState = rememberUseCaseState()
@@ -194,6 +203,13 @@ fun TimePicker(
     }
     onValueChange(updatedItemDetails)
   }
+
+  if (itemDetails.dateStart.isBlank() && isStartTime) {
+    onValueChange(itemDetails.copy(dateStart = dateTime.format(formatter)))
+  } else if (itemDetails.dateFinish.isBlank() && !isStartTime) {
+    onValueChange(itemDetails.copy(dateFinish = dateTime.format(formatter)))
+  }
+
 
   CalendarDialog(
     state = dateState,
@@ -212,6 +228,7 @@ fun TimePicker(
       pickedTime = LocalTime.of(hours, minutes)
       updateTime()
     })
+
 
   Row(
     modifier = Modifier

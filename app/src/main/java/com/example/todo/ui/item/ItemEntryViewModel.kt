@@ -1,5 +1,6 @@
 package com.example.todo.ui.item
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -22,11 +23,13 @@ class ItemEntryViewModel(
 
   fun updateUiState(itemDetails: ToDoItemDetails) {
     itemUiState = ItemUiState(itemDetails = itemDetails, isEntryValid = validateInput(itemDetails))
+    Log.d("Debug", " updateUiState dateStart = ${itemUiState.itemDetails.dateStart}")
+    Log.d("Debug", " updateUiState name = ${itemUiState.itemDetails.name}")
   }
 
   private fun validateInput(uiState: ToDoItemDetails = itemUiState.itemDetails): Boolean {
     return with(uiState) {
-      name.isNotBlank() //&& Utils.convertTimestampToDateTime(dateStart.trim()) < Utils.convertTimestampToDateTime(dateFinish.trim())
+      name.isNotBlank()
     }
   }
 
@@ -34,24 +37,6 @@ class ItemEntryViewModel(
     if (validateInput()) {
       addToDoItemUseCase.addToDoItem(itemUiState.itemDetails.toToDoItem())
     }
-//
-//
-//    val dateStartString = itemUiState.itemDetails.dateStart
-//    val dateFinishString = itemUiState.itemDetails.dateFinish
-//
-//    if (dateStartString.isNotBlank()) {
-//      try {
-//        val dateStart = LocalDate.parse(itemUiState.itemDetails.dateStart, DateTimeFormatter.ISO_LOCAL_DATE)
-//        val localDateTime = LocalDateTime.of(dateStart, time)
-//        val timestamp = localDateTime.toInstant(ZoneOffset.UTC).toEpochMilli()
-//        addToDoItemUseCase.addToDoItem(itemUiState.itemDetails.toToDoItem().copy(dateStart = timestamp))
-//      } catch (e: DateTimeParseException) {
-//        Log.e("Debug", "Error parsing date: $dateStartString", e)
-//      }
-//    } else {
-//    // Обработка случая, когда строка даты пуста
-//    Log.e("Debug", "Date string is blank or empty")
-//  }
   }
 }
 
@@ -69,10 +54,7 @@ data class ToDoItemDetails(
 )
 
 fun ToDoItemDetails.toToDoItem(): ToDoItem {
-  if (dateStart.isBlank() || dateFinish.isBlank()) {
-    // Обработка случая, когда строки дат пусты
-    return ToDoItem(id = id, name = name, description = description, dateStart = 0L, dateFinish = 0L)
-  }
+
   return ToDoItem(
     id = id,
     name = name,
