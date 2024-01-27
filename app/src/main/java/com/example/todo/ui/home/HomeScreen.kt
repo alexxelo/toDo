@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -16,16 +15,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -33,7 +30,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,7 +40,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
@@ -53,7 +48,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -61,6 +55,7 @@ import com.example.todo.AppViewModelProvider
 import com.example.todo.utils.Utils
 import com.example.todo.utils.displayText
 import com.example.todo.utils.rememberFirstCompletelyVisibleMonth
+import com.example.todo.utils.toFormattedDateTime
 import com.kizitonwose.calendar.compose.HorizontalCalendar
 import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.CalendarDay
@@ -79,15 +74,8 @@ fun HomeScreen(
   navigateToItemDetails: (Int) -> Unit,
   navigateToEntry: (date: LocalDate) -> Unit,
   viewModel: HomeViewModel = viewModel(factory = AppViewModelProvider.Factory),
-
-  ) {
-  // дела которые добавлены в базу
+) {
   val homeUi = viewModel.homeUiState.collectAsState()
-//
-//  val toDoItemList by remember {
-//    mutableStateOf(createCalendarList(homeUi.value.toDoList))
-//  }
-
   var outerSelection by remember { mutableStateOf<CalendarDay?>(null) }
 
   Scaffold(
@@ -113,9 +101,11 @@ fun HomeScreen(
       if (outerSelection != null) {
         TodoTable(day = outerSelection!!.date.dayOfMonth.toString(),
           dayOfWeek = outerSelection!!.date.dayOfWeek.name,
+          selectedDate = outerSelection!!.date,
           homeUiState = homeUi.value,
+          viewModel = viewModel,
           onItemClick = {
-
+            //navigateToItemDetails(it)
           })
       }
     }
@@ -291,76 +281,65 @@ private fun CalendarNavigationIcon(
 
 @Composable
 fun TodoTable(
-  day: String, dayOfWeek: String, hoursInDay: Int = 24, homeUiState: HomeUiState, onItemClick: (Int) -> Unit
+  day: String,
+  dayOfWeek: String,
+  selectedDate: LocalDate,
+  hoursInDay: Int = 24,
+  viewModel: HomeViewModel,
+  homeUiState: HomeUiState,
+  onItemClick: (Int) -> Unit
 ) {
   //add day of week
   val listState = rememberLazyListState()
-
   Row {
     Text(
-      modifier = Modifier.padding(horizontal = 8.dp),
+      modifier = Modifier.padding(8.dp),
       text = "$dayOfWeek $day ",
       color = Color.Blue,
       fontWeight = FontWeight.SemiBold,
       fontSize = 25.sp
     )
   }
-  LazyColumn(
-    state = listState,
-    modifier = Modifier,
-    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 16.dp)
-  ) {
-    items(hoursInDay) { hour ->
-      TimeLine(hour, homeUiState, onItemClick)
-    }
-  }
+  Box(modifier = Modifier) {
 
-  LaunchedEffect(true) {
-    listState.scrollToItem(Utils.getCurrentTime().hour)
-  }
+    LazyColumn(
+      state = listState,
+      modifier = Modifier,
+      //contentPadding = PaddingValues(horizontal = 8.dp, vertical = 16.dp)
+    ) {
+      items(hoursInDay) { hour ->
 
-}
+        TimeLine(hour)
 
-@Composable
-fun TimelineNode(
-  contentStartOffset: Dp = 16.dp,
-  spacerBetweenNodes: Dp = 32.dp,
-  content: @Composable BoxScope.(modifier: Modifier) -> Unit
-) {
-  Box(
-    modifier = Modifier
-      .wrapContentSize()
-      .drawBehind {
-        val circleRadiusInPx = 8.sp
-        drawCircle(
-          color = Color.Magenta,
-          radius = circleRadiusInPx.toPx(),
-          center = Offset(circleRadiusInPx.toPx(), circleRadiusInPx.toPx())
-        )
+        //ToDoHourItem2(hour, selectedDate, homeUiState, viewModel, onItemClick)
+
+        ToDoHourItem(hour, selectedDate, homeUiState, viewModel, onItemClick)
+
       }
-  ) {
-    content(
-      Modifier
-        .padding(
-          start = contentStartOffset,
-          bottom = spacerBetweenNodes
-        )
-    )
+    }
+    LaunchedEffect(true) {
+      listState.scrollToItem(Utils.getCurrentTime().hour)
+    }
   }
 }
 
 @Composable
 fun ToDoHourItem(
   hour: Int,
+  selectedDate: LocalDate,
   homeUiState: HomeUiState,
+  viewModel: HomeViewModel,
   onItemClick: (Int) -> Unit
 ) {
-  val matchingData = homeUiState.toDoList.find { Utils.timestampToZonedDateTime(it.dateStart).hour == hour }
+  val matchingData = viewModel.getToDoItemForDay(selectedDate, homeUiState.toDoList, hour)
 
   if (matchingData != null) {
-    Box(modifier = Modifier.clickable { onItemClick(matchingData.id) }) {
+    Box(modifier = Modifier
+      .fillMaxHeight()
+      .padding(horizontal = 70.dp)
+      .clickable { onItemClick(matchingData.id) }) {
       Text(
-        text = "${matchingData.name}\n\n${matchingData.dateStart} - ${matchingData.dateFinish}",
+        text = "${matchingData.name}\n\n${matchingData.dateStart.toFormattedDateTime()} - ${matchingData.dateFinish.toFormattedDateTime()}",
         modifier = Modifier
           .drawBehind {
             drawRoundRect(
@@ -368,7 +347,50 @@ fun ToDoHourItem(
               cornerRadius = CornerRadius(20.dp.toPx())
             )
           }
-          .padding(4.dp)
+          .padding(8.dp)
+      )
+    }
+  }
+}
+
+@Composable
+fun ToDoHourItem2(
+  hour: Int,
+  selectedDate: LocalDate,
+  homeUiState: HomeUiState,
+  viewModel: HomeViewModel,
+  onItemClick: (Int) -> Unit
+) {
+  val matchingData = viewModel.getToDoItemForDay(selectedDate, homeUiState.toDoList, hour)
+
+  if (matchingData != null) {
+    val startDateTime = Utils.timestampToZonedDateTime(matchingData.dateStart)
+    val finishDateTime = Utils.timestampToZonedDateTime(matchingData.dateFinish)
+
+    val startOffset = maxOf(hour * 60 - (startDateTime.hour * 60 + startDateTime.minute), 0)
+    val finishOffset = minOf(hour * 60 + 60 - (finishDateTime.hour * 60 + finishDateTime.minute), 60)
+
+    Box(
+      modifier = Modifier
+        .clickable { onItemClick(matchingData.id) }
+        .background(
+          color = Color(0xFFBBAAEE),
+          shape = RoundedCornerShape(
+            topStartPercent = (startOffset / 60.0 * 100)
+              .coerceIn(0.0, 100.0)
+              .toInt(),
+            topEndPercent = (finishOffset / 60.0 * 100)
+              .coerceIn(0.0, 100.0)
+              .toInt(),
+            bottomStartPercent = 0,
+            bottomEndPercent = 0
+          )
+        )
+        .padding(4.dp)
+    ) {
+      Text(
+        text = "${matchingData.name}\n\n${matchingData.dateStart.toFormattedDateTime()} - ${matchingData.dateFinish.toFormattedDateTime()}",
+        modifier = Modifier.padding(8.dp)
       )
     }
   }
@@ -376,16 +398,15 @@ fun ToDoHourItem(
 
 @Composable
 fun TimeLine(
-  hour: Int, homeUiState: HomeUiState,
-  onItemClick: (Int) -> Unit
+  hour: Int,
 ) {
   Row(
     modifier = Modifier
-      .fillMaxWidth()
+      //.fillMaxWidth()
       .height(48.dp)
   ) {
     Text(
-      text = "${hour} : 00",
+      text = "$hour : 00",
       modifier = Modifier
         .padding(horizontal = 8.dp)
     )
@@ -398,7 +419,6 @@ fun TimeLine(
         .background(Color.Gray)
         .width(1.dp)
     )
-    ToDoHourItem(hour, homeUiState, onItemClick)
   }
 }
 
@@ -406,18 +426,5 @@ fun TimeLine(
 @Preview(showSystemUi = true, showBackground = true, device = Devices.NEXUS_5)
 @Composable
 fun HomeScreenPreview(modifier: Modifier = Modifier) {
-
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun TimelinePreview() {
-  Column(
-    modifier = Modifier
-      .fillMaxWidth()
-      .padding(16.dp)
-  ) {
-
-  }
 
 }
