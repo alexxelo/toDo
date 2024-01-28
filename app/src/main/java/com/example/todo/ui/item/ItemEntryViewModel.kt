@@ -60,9 +60,9 @@ fun ToDoItemDetails.toToDoItem(): ToDoItem {
     name = name,
     description = description,
     dateStart = LocalDateTime.parse(dateStart, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-      .toInstant(ZoneOffset.UTC).toEpochMilli(),
+      .toInstant(ZoneOffset.UTC).toEpochMilli().toString().toLongOrNull() ?: 0L,
     dateFinish = LocalDateTime.parse(dateFinish, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-      .toInstant(ZoneOffset.UTC).toEpochMilli()
+      .toInstant(ZoneOffset.UTC).toEpochMilli().toString().toLongOrNull() ?: 0L,
   )
 }
 fun ToDoItem.toToDoItemDetails(): ToDoItemDetails = ToDoItemDetails(

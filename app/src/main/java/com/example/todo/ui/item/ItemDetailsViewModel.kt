@@ -29,7 +29,7 @@ class ItemDetailsViewModel(
       initialValue = ToDoItemDetailsUiState()
     )
   suspend fun delete(){
-    deleteToDoItemUseCase.deleteToDoItem(uiState.value.itemDetails.toToDoItem())
+    //deleteToDoItemUseCase.deleteToDoItem(uiState.value.itemDetails.toToDoItem())
   }
 
   companion object {

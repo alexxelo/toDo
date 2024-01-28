@@ -5,9 +5,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -24,6 +29,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.todo.AppViewModelProvider
 import com.example.todo.R
+import com.example.todo.utils.toFormattedDate
+import com.example.todo.utils.toFormattedDateTime
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -31,6 +38,7 @@ import kotlinx.coroutines.launch
 fun ItemDetailsScreen(
   modifier: Modifier = Modifier,
   navigateBack: () -> Unit,
+  navigateToEdit: () -> Unit,
   viewModel: ItemDetailsViewModel = viewModel(factory = AppViewModelProvider.Factory),
 
   ) {
@@ -50,6 +58,13 @@ fun ItemDetailsScreen(
             Text(text = stringResource(R.string.cancel), fontSize = 20.sp)
           }
         },
+        actions = {
+          TextButton(onClick = {
+            navigateToEdit()
+          }) {
+            Text(text = stringResource(R.string.edit), fontSize = 20.sp)
+          }
+        }
       )
     },
     bottomBar = {
@@ -64,6 +79,7 @@ fun ItemDetailsScreen(
         }
       })
     }
+
   ) { padding ->
     Box(
       modifier = modifier
@@ -80,7 +96,7 @@ fun ItemDetailsScreen(
 @Composable
 fun ItemDetails(
   itemDetailsUiState: ToDoItemDetailsUiState,
-  ) {
+) {
   Column(
     modifier = Modifier
       .padding(8.dp)
@@ -90,17 +106,24 @@ fun ItemDetails(
       text = itemDetailsUiState.itemDetails.name,
       fontSize = 26.sp,
       fontWeight = FontWeight.Bold,
-      textAlign = TextAlign.Start
+      textAlign = TextAlign.Start,
+      modifier = Modifier.fillMaxWidth()
     )
 
     Text(
-      text = " from time day year TO time day year",
-      textAlign = TextAlign.Left
+      text = "${itemDetailsUiState.itemDetails.dateStart.toLongOrNull()?.toFormattedDate()}, " +
+          "${itemDetailsUiState.itemDetails.dateStart.toLongOrNull()?.toFormattedDateTime()} " +
+          "- ${itemDetailsUiState.itemDetails.dateFinish.toLongOrNull()?.toFormattedDateTime()}",
+      textAlign = TextAlign.Left,
+      modifier = Modifier.fillMaxWidth()
+
     )
 
     Text(
-      text = itemDetailsUiState.itemDetails.toToDoItem().description,
-      fontSize = 20.sp
+      text = itemDetailsUiState.itemDetails.description,
+      fontSize = 20.sp,
+      modifier = Modifier.fillMaxWidth()
+
     )
   }
 }

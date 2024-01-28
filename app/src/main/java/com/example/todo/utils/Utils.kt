@@ -17,6 +17,7 @@ import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 import java.time.format.TextStyle
 import java.util.Locale
 
@@ -40,6 +41,12 @@ fun Long.toFormattedDateTime(): String {
   val instant = Instant.ofEpochMilli(this)
   val localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
   val formatter = DateTimeFormatter.ofPattern("HH:mm")
+  return localDateTime.format(formatter)
+}
+fun Long.toFormattedDate(): String {
+  val instant = Instant.ofEpochMilli(this)
+  val localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
+  val formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd")
   return localDateTime.format(formatter)
 }
 

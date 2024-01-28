@@ -105,7 +105,7 @@ fun HomeScreen(
           homeUiState = homeUi.value,
           viewModel = viewModel,
           onItemClick = {
-            //navigateToItemDetails(it)
+            navigateToItemDetails(it)
           })
       }
     }
