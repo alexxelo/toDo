@@ -1,5 +1,6 @@
 package com.example.todo.utils
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -17,7 +18,6 @@ import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
 import java.time.format.TextStyle
 import java.util.Locale
 
@@ -26,10 +26,12 @@ class Utils {
     fun getCurrentTime(): LocalTime {
       return LocalTime.now()
     }
+
     fun timestampToZonedDateTime(timestamp: Long): ZonedDateTime {
       val instant = Instant.ofEpochMilli(timestamp)
       return ZonedDateTime.ofInstant(instant, ZoneId.systemDefault())
     }
+
     fun timestampToLocalDate(timestamp: Long): LocalDate {
       val instant = Instant.ofEpochMilli(timestamp)
       return instant.atZone(ZoneId.systemDefault()).toLocalDate()
@@ -38,11 +40,14 @@ class Utils {
 }
 
 fun Long.toFormattedDateTime(): String {
+  Log.d("debug", "toFormattedDateTime = ${this}")
+
   val instant = Instant.ofEpochMilli(this)
   val localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
   val formatter = DateTimeFormatter.ofPattern("HH:mm")
   return localDateTime.format(formatter)
 }
+
 fun Long.toFormattedDate(): String {
   val instant = Instant.ofEpochMilli(this)
   val localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())

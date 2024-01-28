@@ -13,8 +13,8 @@ import kotlinx.coroutines.flow.stateIn
 import java.time.LocalDate
 
 class HomeViewModel(toDoListRepository: ToDoListRepository) : ViewModel() {
-  fun getToDoItemForDay(date: LocalDate, toDoList: List<ToDoItem>, hour: Int): ToDoItem? {
-    return toDoList.find {
+  fun getToDoItemForDay(date: LocalDate, toDoList: List<ToDoItem>, hour: Int): List<ToDoItem>  {
+    return toDoList.filter {
       Utils.timestampToLocalDate(it.dateStart) == date &&
       Utils.timestampToZonedDateTime(it.dateStart).hour == hour
     }

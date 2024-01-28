@@ -5,7 +5,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -331,28 +330,31 @@ fun ToDoHourItem(
   viewModel: HomeViewModel,
   onItemClick: (Int) -> Unit
 ) {
-  val matchingData = viewModel.getToDoItemForDay(selectedDate, homeUiState.toDoList, hour)
+  val matchingDataList = viewModel.getToDoItemForDay(selectedDate, homeUiState.toDoList, hour)
 
-  if (matchingData != null) {
+  if (matchingDataList.isNotEmpty()) {
     Box(modifier = Modifier
       .fillMaxHeight()
       .padding(horizontal = 70.dp)
-      .clickable { onItemClick(matchingData.id) }) {
-      Text(
-        text = "${matchingData.name}\n\n${matchingData.dateStart.toFormattedDateTime()} - ${matchingData.dateFinish.toFormattedDateTime()}",
-        modifier = Modifier
-          .drawBehind {
-            drawRoundRect(
-              Color(0xFFBBAAEE),
-              cornerRadius = CornerRadius(20.dp.toPx())
-            )
-          }
-          .padding(8.dp)
-      )
+      .clickable { onItemClick(matchingDataList.first().id) }) {
+      matchingDataList.forEach { matchingData ->
+
+        Text(
+          text = "${matchingData.name}\n\n${matchingData.dateStart.toFormattedDateTime()} - ${matchingData.dateFinish.toFormattedDateTime()}",
+          modifier = Modifier
+            .drawBehind {
+              drawRoundRect(
+                Color(0xFFBBAAEE),
+                cornerRadius = CornerRadius(20.dp.toPx())
+              )
+            }
+            .padding(8.dp)
+        )
+      }
     }
   }
 }
-
+/*
 @Composable
 fun ToDoHourItem2(
   hour: Int,
@@ -395,7 +397,7 @@ fun ToDoHourItem2(
     }
   }
 }
-
+*/
 @Composable
 fun TimeLine(
   hour: Int,
