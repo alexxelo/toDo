@@ -18,11 +18,13 @@ class ItemDetailsViewModel(
   private val getToDoItemUseCase = GetToDoItemUseCase(toDoListRepository)
   private val deleteToDoItemUseCase = DeleteToDoItemUseCase(toDoListRepository)
 
-  private val itemId: Int = checkNotNull(savedStateHandle["itemId"] ?: -1)
+  private val itemId: Int = checkNotNull(savedStateHandle["itemId"])
 
   val uiState = getToDoItemUseCase.getToDoItem(itemId)
     .filterNotNull()
-    .map { ToDoItemDetailsUiState(it.toToDoItemDetails()) }
+    .map {
+      ToDoItemDetailsUiState(itemDetails = it.toToDoItemDetails())
+    }
     .stateIn(
       scope = viewModelScope,
       started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),

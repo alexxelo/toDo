@@ -206,8 +206,10 @@ fun TimePicker(
 
   if (itemDetails.dateStart.isBlank() && isStartTime) {
     onValueChange(itemDetails.copy(dateStart = dateTime.format(formatter)))
+
   } else if (itemDetails.dateFinish.isBlank() && !isStartTime) {
     onValueChange(itemDetails.copy(dateFinish = dateTime.format(formatter)))
+
   }
 
 
