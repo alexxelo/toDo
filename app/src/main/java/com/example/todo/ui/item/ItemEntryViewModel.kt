@@ -49,21 +49,20 @@ data class ToDoItemDetails(
   val dateFinish: String = "",
 )
 
-fun ToDoItemDetails.toToDoItem(): ToDoItem {
-  return ToDoItem(
-    id = id,
-    name = name,
-    description = description,
-    dateStart = LocalDateTime.parse(dateStart, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-      .atZone(ZoneId.systemDefault())
-      .toInstant()
-      .toEpochMilli(),
-    dateFinish = LocalDateTime.parse(dateFinish, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-      .atZone(ZoneId.systemDefault())
-      .toInstant()
-      .toEpochMilli(),
-  )
-}
+fun ToDoItemDetails.toToDoItem(): ToDoItem = ToDoItem(
+  id = id,
+  name = name,
+  description = description,
+  dateStart = dateStart.toLongOrNull() ?: LocalDateTime.parse(dateStart, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+    .atZone(ZoneId.systemDefault())
+    .toInstant()
+    .toEpochMilli(),
+  dateFinish = dateFinish.toLongOrNull() ?: LocalDateTime.parse(dateFinish, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+    .atZone(ZoneId.systemDefault())
+    .toInstant()
+    .toEpochMilli()
+)
+
 
 fun ToDoItem.toToDoItemDetails(): ToDoItemDetails = ToDoItemDetails(
   id = id,

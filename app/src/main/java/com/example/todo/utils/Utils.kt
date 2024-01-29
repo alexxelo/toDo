@@ -1,6 +1,5 @@
 package com.example.todo.utils
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -40,8 +39,6 @@ class Utils {
 }
 
 fun Long.toFormattedDateTime(): String {
-  Log.d("debug", "toFormattedDateTime = ${this}")
-
   val instant = Instant.ofEpochMilli(this)
   val localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
   val formatter = DateTimeFormatter.ofPattern("HH:mm")

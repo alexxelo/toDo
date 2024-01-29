@@ -5,7 +5,7 @@ import com.example.todo.domain.ToDoListRepository
 import kotlinx.coroutines.flow.Flow
 
 class GetToDoItemUseCase(private val toDoListRepository: ToDoListRepository) {
-  fun getToDoItem(itemId: Int): Flow<ToDoItem> {
+  fun getToDoItem(itemId: Int): Flow<ToDoItem?> {
     return toDoListRepository.getToDoItem(itemId)
   }
 }
