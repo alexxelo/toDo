@@ -75,7 +75,9 @@ fun ItemEntryScreen(
     )
   }) { innerPadding ->
     ToDoEntryBody(
-      itemUiState = viewModel.itemUiState, date = date.toLocalDate(), onSaveClick = {
+      itemUiState = viewModel.itemUiState,
+      date = date.toLocalDate(),
+      onSaveClick = {
         scope.launch {
           viewModel.saveToDoItem()
           navigateBack()
@@ -92,7 +94,11 @@ fun ItemEntryScreen(
 
 @Composable
 fun ToDoEntryBody(
-  itemUiState: ItemUiState, date: LocalDate, onSaveClick: () -> Unit, onValueChange: (ToDoItemDetails) -> Unit = {}, modifier: Modifier = Modifier
+  itemUiState: ItemUiState,
+  date: LocalDate,
+  onSaveClick: () -> Unit,
+  onValueChange: (ToDoItemDetails) -> Unit = {},
+  modifier: Modifier = Modifier
 ) {
   Column(
     verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large)),

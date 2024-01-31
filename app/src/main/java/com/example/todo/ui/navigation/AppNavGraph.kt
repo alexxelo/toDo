@@ -9,14 +9,17 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.todo.ui.home.HomeScreen
 import com.example.todo.ui.item.ItemDetailsScreen
+import com.example.todo.ui.item.ItemEditScreen
 import com.example.todo.ui.item.ItemEntryScreen
 import java.time.Instant
+import java.time.LocalDateTime
 import java.time.ZoneId
 
 object Destinations {
   const val HOME = "home"
   const val ENTRY = "entry"
   const val DETAIL = "detail"
+  const val EDIT = "edit"
 }
 
 @Composable
@@ -46,9 +49,21 @@ fun AppNavGraph(
     ) {
       ItemDetailsScreen(
         navigateBack = { navController.popBackStack() },
-        navigateToEdit = {}
+        navigateToEdit = { item -> navController.navigate("${Destinations.EDIT}/$item")}
       )
     }
+    composable(
+      route = "${Destinations.EDIT}/{itemId}",
+      arguments = listOf(navArgument("itemId") { type = NavType.IntType })
+    ) { backStackEntry->
+      val id = backStackEntry.arguments?.getInt("itemId")
+      ItemEditScreen(
+        //
+        date = LocalDateTime.now(),
+        navigateBack = { navController.popBackStack() },
+      )
+    }
+
     composable(
       route = "${Destinations.ENTRY}/{date}",
       arguments = listOf(navArgument("date") { type = NavType.LongType })
@@ -60,6 +75,5 @@ fun AppNavGraph(
         navigateBack = { navController.popBackStack() },
       )
     }
-
   }
 }

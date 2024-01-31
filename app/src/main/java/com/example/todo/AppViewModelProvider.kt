@@ -7,6 +7,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.todo.ui.home.HomeViewModel
 import com.example.todo.ui.item.ItemDetailsViewModel
+import com.example.todo.ui.item.ItemEditViewModel
 import com.example.todo.ui.item.ItemEntryViewModel
 
 object AppViewModelProvider {
@@ -29,6 +30,12 @@ object AppViewModelProvider {
     // Initializer for HomeViewModel
     initializer {
       HomeViewModel(
+        toDoApplication().container.toDoListRepository
+      )
+    }
+    initializer {
+      ItemEditViewModel(
+        this.createSavedStateHandle(),
         toDoApplication().container.toDoListRepository
       )
     }
