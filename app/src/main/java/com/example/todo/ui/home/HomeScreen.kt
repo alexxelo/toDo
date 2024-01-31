@@ -51,8 +51,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.todo.AppViewModelProvider
-import com.example.todo.utils.Utils
 import com.example.todo.utils.displayText
+import com.example.todo.utils.getCurrentTime
 import com.example.todo.utils.rememberFirstCompletelyVisibleMonth
 import com.example.todo.utils.toFormattedDateTime
 import com.kizitonwose.calendar.compose.HorizontalCalendar
@@ -317,7 +317,7 @@ fun TodoTable(
       }
     }
     LaunchedEffect(true) {
-      listState.scrollToItem(Utils.getCurrentTime().hour)
+      listState.scrollToItem(getCurrentTime().hour)
     }
   }
 }

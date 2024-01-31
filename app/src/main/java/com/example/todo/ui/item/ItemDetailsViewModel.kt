@@ -13,10 +13,10 @@ import kotlinx.coroutines.flow.stateIn
 
 class ItemDetailsViewModel(
   savedStateHandle: SavedStateHandle,
-  toDoListRepository: ToDoListRepository
+  repository: ToDoListRepository
 ) : ViewModel() {
-  private val getToDoItemUseCase = GetToDoItemUseCase(toDoListRepository)
-  private val deleteToDoItemUseCase = DeleteToDoItemUseCase(toDoListRepository)
+  private val getToDoItemUseCase = GetToDoItemUseCase(repository)
+  private val deleteToDoItemUseCase = DeleteToDoItemUseCase(repository)
 
   private val itemId: Int = checkNotNull(savedStateHandle["itemId"])
 

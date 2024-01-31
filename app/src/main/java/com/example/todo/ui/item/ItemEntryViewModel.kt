@@ -57,6 +57,7 @@ fun ToDoItemDetails.toToDoItem(): ToDoItem = ToDoItem(
     .atZone(ZoneId.systemDefault())
     .toInstant()
     .toEpochMilli(),
+
   dateFinish = dateFinish.toLongOrNull() ?: LocalDateTime.parse(dateFinish, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
     .atZone(ZoneId.systemDefault())
     .toInstant()
@@ -72,4 +73,7 @@ fun ToDoItem.toToDoItemDetails(): ToDoItemDetails = ToDoItemDetails(
   dateFinish = dateFinish.toString()
 
 )
-
+fun ToDoItem.toItemUiState(isEntryValid: Boolean = false): ItemUiState = ItemUiState(
+  itemDetails = this.toToDoItemDetails(),
+  isEntryValid = isEntryValid
+)

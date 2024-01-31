@@ -38,7 +38,7 @@ import kotlinx.coroutines.launch
 fun ItemDetailsScreen(
   modifier: Modifier = Modifier,
   navigateBack: () -> Unit,
-  navigateToEdit: () -> Unit,
+  navigateToEdit: (Int) -> Unit,
   viewModel: ItemDetailsViewModel = viewModel(factory = AppViewModelProvider.Factory),
 
   ) {
@@ -60,7 +60,7 @@ fun ItemDetailsScreen(
         },
         actions = {
           TextButton(onClick = {
-            navigateToEdit()
+            navigateToEdit(uiState.value.itemDetails.id)
           }) {
             Text(text = stringResource(R.string.edit), fontSize = 20.sp)
           }

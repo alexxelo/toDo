@@ -5,22 +5,23 @@ import androidx.lifecycle.viewModelScope
 import com.example.todo.data.ToDoItem
 import com.example.todo.domain.ToDoListRepository
 import com.example.todo.domain.useCases.GetToDoListUseCase
-import com.example.todo.utils.Utils
+import com.example.todo.utils.timestampToLocalDate
+import com.example.todo.utils.timestampToZonedDateTime
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import java.time.LocalDate
 
-class HomeViewModel(toDoListRepository: ToDoListRepository) : ViewModel() {
+class HomeViewModel(repository: ToDoListRepository) : ViewModel() {
   fun getToDoItemForDay(date: LocalDate, toDoList: List<ToDoItem>, hour: Int): List<ToDoItem>  {
     return toDoList.filter {
-      Utils.timestampToLocalDate(it.dateStart) == date &&
-      Utils.timestampToZonedDateTime(it.dateStart).hour == hour
+      timestampToLocalDate(it.dateStart) == date &&
+      timestampToZonedDateTime(it.dateStart).hour == hour
     }
   }
 
-  private val getToDoListUseCase = GetToDoListUseCase(toDoListRepository)
+  private val getToDoListUseCase = GetToDoListUseCase(repository)
 
   val homeUiState: StateFlow<HomeUiState> = getToDoListUseCase.getToDoList().map { HomeUiState(it) }
     .stateIn(
