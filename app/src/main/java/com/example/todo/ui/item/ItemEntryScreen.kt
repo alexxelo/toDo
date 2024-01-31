@@ -36,7 +36,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.todo.AppViewModelProvider
 import com.example.todo.R
-import com.example.todo.utils.Utils
+import com.example.todo.utils.getCurrentTime
 import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
 import com.maxkeppeler.sheets.calendar.CalendarDialog
 import com.maxkeppeler.sheets.calendar.models.CalendarConfig
@@ -136,7 +136,7 @@ fun ToDoItemEntryForm(
         onValueChange(updatedItemDetails)})
     TimePicker(
       text = stringResource(R.string.ends), date = date, itemDetails, isStartTime = false,
-      initialTime = Utils.getCurrentTime().plusHours(1),
+      initialTime = getCurrentTime().plusHours(1),
       onValueChange = { updatedItemDetails ->
         onValueChange(updatedItemDetails)
       },
@@ -168,7 +168,7 @@ fun TimePicker(
   itemDetails: ToDoItemDetails,
   onValueChange: (ToDoItemDetails) -> Unit = {},
   isStartTime: Boolean = true,
-  initialTime: LocalTime = Utils.getCurrentTime()
+  initialTime: LocalTime = getCurrentTime()
 ) {
   var pickedDate by remember {
     mutableStateOf(date)

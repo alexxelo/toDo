@@ -100,6 +100,4 @@ dependencies {
 
 // The compose calendar library
   implementation ("com.kizitonwose.calendar:compose:2.4.1")
-
-
 }

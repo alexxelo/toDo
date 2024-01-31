@@ -20,22 +20,16 @@ import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
 
-class Utils {
-  companion object {
-    fun getCurrentTime(): LocalTime {
-      return LocalTime.now()
-    }
-
-    fun timestampToZonedDateTime(timestamp: Long): ZonedDateTime {
-      val instant = Instant.ofEpochMilli(timestamp)
-      return ZonedDateTime.ofInstant(instant, ZoneId.systemDefault())
-    }
-
-    fun timestampToLocalDate(timestamp: Long): LocalDate {
-      val instant = Instant.ofEpochMilli(timestamp)
-      return instant.atZone(ZoneId.systemDefault()).toLocalDate()
-    }
-  }
+fun getCurrentTime(): LocalTime {
+  return LocalTime.now()
+}
+fun timestampToZonedDateTime(timestamp: Long): ZonedDateTime {
+  val instant = Instant.ofEpochMilli(timestamp)
+  return ZonedDateTime.ofInstant(instant, ZoneId.systemDefault())
+}
+fun timestampToLocalDate(timestamp: Long): LocalDate {
+  val instant = Instant.ofEpochMilli(timestamp)
+  return instant.atZone(ZoneId.systemDefault()).toLocalDate()
 }
 
 fun Long.toFormattedDateTime(): String {
