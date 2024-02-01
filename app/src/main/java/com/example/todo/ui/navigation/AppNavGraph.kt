@@ -57,8 +57,9 @@ fun AppNavGraph(
       arguments = listOf(navArgument("itemId") { type = NavType.IntType })
     ) { backStackEntry->
       val id = backStackEntry.arguments?.getInt("itemId")
+
       ItemEditScreen(
-        //
+
         date = LocalDateTime.now(),
         navigateBack = { navController.popBackStack() },
       )

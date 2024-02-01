@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import com.example.todo.data.ToDoItem
 import com.example.todo.domain.ToDoListRepository
 import com.example.todo.domain.useCases.AddToDoItemUseCase
+import com.example.todo.utils.timeToLocalDateTime
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -53,15 +54,8 @@ fun ToDoItemDetails.toToDoItem(): ToDoItem = ToDoItem(
   id = id,
   name = name,
   description = description,
-  dateStart = dateStart.toLongOrNull() ?: LocalDateTime.parse(dateStart, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-    .atZone(ZoneId.systemDefault())
-    .toInstant()
-    .toEpochMilli(),
-
-  dateFinish = dateFinish.toLongOrNull() ?: LocalDateTime.parse(dateFinish, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-    .atZone(ZoneId.systemDefault())
-    .toInstant()
-    .toEpochMilli()
+  dateStart = if(dateStart.isNotBlank()) timeToLocalDateTime(dateStart) else 0L,
+  dateFinish = if(dateFinish.isNotBlank())timeToLocalDateTime(dateFinish) else 0L
 )
 
 

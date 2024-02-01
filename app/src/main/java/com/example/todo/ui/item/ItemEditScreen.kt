@@ -1,6 +1,7 @@
 package com.example.todo.ui.item
 
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -17,9 +18,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.todo.AppViewModelProvider
 import com.example.todo.R
+import com.example.todo.utils.timeToLocalDateTime
+import com.example.todo.utils.timestampToLocalDate
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -30,7 +35,7 @@ fun ItemEditScreen(
     viewModel: ItemEditViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val coroutineScope = rememberCoroutineScope()
-
+    Log.d("debug", " date start vm = ${viewModel.itemUiState.itemDetails.dateStart}")
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -49,7 +54,7 @@ fun ItemEditScreen(
     ) { innerPadding ->
         ToDoEntryBody(
             itemUiState = viewModel.itemUiState,
-            date = date.toLocalDate(),
+            date = timestampToLocalDate(viewModel.itemUiState.itemDetails.dateStart.toLong()),
             onValueChange = viewModel::updateUiState,
             onSaveClick = {
                 coroutineScope.launch {
@@ -59,6 +64,7 @@ fun ItemEditScreen(
             },
             modifier = modifier.padding(innerPadding)
         )
+
     }
 }
 
